@@ -121,6 +121,15 @@ Se definieron en equipo varios puntos que la letra deja abiertos (consultados co
 - Se estudió cómo estructurar el backend y cómo funciona FastAPI.
 - Se configuró el entorno virtual de Python y se creó un endpoint de prueba (`GET /hola`) para verificar que el servidor funciona.
 - Se agregó un `.gitignore` para excluir el entorno virtual, la caché de Python y el archivo `.env`.
+
+## 04/11/2026 — Conexión a la base y estructura del backend
+
+### Qué se hizo
+
+- Se conectó el backend a MySQL usando el usuario `torneo_admin`, con las credenciales en un archivo `.env` que no se sube al repositorio (se incluye un `.env.example` con las variables necesarias).
+- Se organizó el backend en capas: `db.py` para la conexión, `repositories/` para las consultas SQL y `routes/` para los endpoints.
+- Se creó el primer endpoint que lee datos de la base: `GET /facultades`.
+- Se configuró VS Code para usar el entorno virtual del proyecto.
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título

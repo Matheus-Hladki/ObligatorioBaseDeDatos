@@ -1,9 +1,7 @@
-# Creo archivo para probar funcionamiento basico
-
 from fastapi import FastAPI
+
+from routes import facultades
 
 app = FastAPI()
 
-@app.get("/hola")
-def hola():
-    return {"mensaje": "funciona"}
+app.include_router(facultades.router)
