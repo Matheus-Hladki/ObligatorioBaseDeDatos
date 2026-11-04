@@ -113,6 +113,14 @@ Se definieron en equipo varios puntos que la letra deja abiertos (consultados co
 - `tables.sql`: columna `estado_anterior` en `partido_reprogramacion`.
 - `triggers.sql`: control de que el día del partido esté dentro del rango del torneo (al programar y al modificar), control al cambiar las fechas del torneo, y registro del estado anterior en el historial de reprogramaciones.
 
+## 04/11/2026 — Inicio del backend
+
+### Qué se hizo
+
+- Se mergeó la rama de la base de datos a `main` y se creó la rama `backend`.
+- Se estudió cómo estructurar el backend y cómo funciona FastAPI.
+- Se configuró el entorno virtual de Python y se creó un endpoint de prueba (`GET /hola`) para verificar que el servidor funciona.
+- Se agregó un `.gitignore` para excluir el entorno virtual, la caché de Python y el archivo `.env`.
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título
