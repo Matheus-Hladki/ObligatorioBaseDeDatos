@@ -130,6 +130,15 @@ Se definieron en equipo varios puntos que la letra deja abiertos (consultados co
 - Se organizó el backend en capas: `db.py` para la conexión, `repositories/` para las consultas SQL y `routes/` para los endpoints.
 - Se creó el primer endpoint que lee datos de la base: `GET /facultades`.
 - Se configuró VS Code para usar el entorno virtual del proyecto.
+
+## 04/11/2026 — ABM de facultades
+
+### Qué se hizo
+
+- Se completó el ABM de facultades: listar, obtener una, crear, modificar y borrar.
+- Se validan los datos recibidos con modelos de Pydantic (respuesta `422` si no son válidos).
+- Se traducen los errores de la base a respuestas claras: `404` si la facultad no existe, `409` si el nombre ya está usado o si la facultad tiene jugadores o equipos asociados.
+- Se detectó que MySQL informa el error de clave foránea con códigos distintos según los privilegios del usuario (`1451` o `1217`), y se contemplan ambos.
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título
