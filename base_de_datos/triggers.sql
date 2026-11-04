@@ -169,6 +169,15 @@ BEGIN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'No se puede finalizar el torneo: quedan partidos programados o postergados';
     END IF;
+
+
+    IF (NEW.fecha_inicio <> OLD.fecha_inicio OR NEW.fecha_fin <> OLD.fecha_fin)
+       AND EXISTS (SELECT 1 FROM partido
+                    WHERE id_torneo = OLD.id_torneo
+                      AND dia NOT BETWEEN NEW.fecha_inicio AND NEW.fecha_fin) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Las nuevas fechas del torneo dejan partidos fuera de su rango';
+    END IF;
 END$$
 
 CREATE PROCEDURE sp_validar_partido(
@@ -244,10 +253,21 @@ BEGIN
     END IF;
 END$$
 
+CREATE PROCEDURE sp_validar_dia_torneo(IN p_id_torneo INT, IN p_dia DATE)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM torneo
+                    WHERE id_torneo = p_id_torneo
+                      AND p_dia BETWEEN fecha_inicio AND fecha_fin) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'El partido debe jugarse entre la fecha de inicio y la de fin del torneo';
+    END IF;
+END$$
+
 CREATE TRIGGER trg_partido_insert
 BEFORE INSERT ON partido
 FOR EACH ROW
 BEGIN
+    CALL sp_validar_dia_torneo(NEW.id_torneo, NEW.dia);
     CALL sp_validar_partido(0, NEW.id_torneo, NEW.numero_fecha,
                             NEW.id_equipo_local, NEW.id_equipo_visitante, NEW.estado);
     IF NEW.estado = 'jugado' THEN
@@ -279,6 +299,7 @@ BEGIN
             SET MESSAGE_TEXT = 'Un partido cancelado no puede reactivarse; programe un partido nuevo';
     END IF;
 
+    CALL sp_validar_dia_torneo(NEW.id_torneo, NEW.dia);
     CALL sp_validar_partido(OLD.id_partido, NEW.id_torneo, NEW.numero_fecha,
                             NEW.id_equipo_local, NEW.id_equipo_visitante, NEW.estado);
 
@@ -297,10 +318,10 @@ BEGIN
             AND OLD.id_complejo = NEW.id_complejo) THEN
         INSERT INTO partido_reprogramacion
             (id_partido, dia_anterior, id_turno_anterior,
-             nombre_cancha_anterior, id_complejo_anterior, motivo)
+             nombre_cancha_anterior, id_complejo_anterior, estado_anterior, motivo)
         VALUES
             (OLD.id_partido, OLD.dia, OLD.id_turno,
-             OLD.nombre_cancha, OLD.id_complejo, @motivo_reprogramacion);
+             OLD.nombre_cancha, OLD.id_complejo, OLD.estado, @motivo_reprogramacion);
         SET @motivo_reprogramacion = NULL;
     END IF;
 END$$

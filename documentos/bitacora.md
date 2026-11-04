@@ -94,6 +94,25 @@ Se separó en un archivo por responsabilidad para que cada parte sea fácil de e
 - El torneo en curso se carga en estado de inscripción, se arman los planteles y después pasa a "en curso", igual que en el uso real.
 - Se quitaron los usuarios de `login`: se van a crear desde el backend con bcrypt.
 
+## 03/11/2026 — Decisiones de diseño del equipo
+
+### Qué se hizo
+
+Se definieron en equipo varios puntos que la letra deja abiertos (consultados con el docente, que indicó que son decisiones de diseño), y se ajustó la base para reflejarlos.
+
+### Decisiones tomadas y por qué
+
+- **Una facultad puede inscribir más de un equipo por edición.** La letra no lo prohíbe. La base ya lo permitía: solo exige que el nombre del equipo no se repita en la edición. Como un jugador puede estar en un solo equipo por edición, dos equipos de la misma facultad nunca comparten jugadores.
+- **Un partido postergado sigue bloqueando el cruce entre los dos equipos.** Mientras está postergado, cuenta como partido no cancelado: esos equipos no pueden tener otro partido entre sí ni otro partido en esa fecha del torneo, y conserva su día, turno y cancha originales. Cuando se reprograma, se actualizan esos datos y los anteriores quedan en el historial. No suma para posiciones ni goleadores hasta que se juega. El backend puede sugerir el siguiente turno disponible, pero la reprogramación la confirma el administrador.
+- **Los partidos se juegan entre la fecha de inicio y la de fin del torneo.** Se agregó el control en la base. Si un partido se suspende en la última fecha y hay que jugarlo después, el administrador extiende la fecha de fin del torneo y luego lo reprograma; así la regla no tiene excepciones y la extensión queda registrada en los datos. Tampoco se pueden cambiar las fechas del torneo si eso deja partidos fuera del rango.
+- **Se puede cambiar la cancha de un partido ya programado**, mientras no se haya jugado y la cancha nueva esté libre en ese día y turno. Para que un cambio de cancha no cuente como postergación, el historial de reprogramaciones ahora guarda el estado que tenía el partido al moverse (`estado_anterior`). El reporte de postergados cuenta solo los partidos que se movieron estando postergados.
+- **El login es solo para administradores y planilleros**, que son los dos roles que pide la letra. Los jugadores no tienen usuario y no pueden editar sus datos.
+
+### Cambios en los archivos
+
+- `tables.sql`: columna `estado_anterior` en `partido_reprogramacion`.
+- `triggers.sql`: control de que el día del partido esté dentro del rango del torneo (al programar y al modificar), control al cambiar las fechas del torneo, y registro del estado anterior en el historial de reprogramaciones.
+
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título
