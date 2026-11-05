@@ -1,0 +1,48 @@
+def listar(conexion, id_torneo, ci_jugador):
+	cursor = conexion.cursor(dictionary=True)
+	cursor.execute("""
+		SELECT s.id_sancion, s.ci_jugador, j.nombre, j.apellido,
+		       s.id_torneo, s.motivo, s.numero_fecha_inicio, s.cantidad_fechas,
+		       s.numero_fecha_inicio + s.cantidad_fechas - 1 AS numero_fecha_fin,
+		       s.id_tarjeta
+		FROM sancion_jugador s
+		JOIN jugador j ON j.ci = s.ci_jugador
+		WHERE s.id_torneo = %s
+		  AND (%s IS NULL OR s.ci_jugador = %s)
+		ORDER BY s.numero_fecha_inicio, j.apellido, j.nombre
+	""", (id_torneo, ci_jugador, ci_jugador))
+	return cursor.fetchall()
+
+
+def crear_disciplinaria(conexion, ci_jugador, id_torneo, numero_fecha_inicio, cantidad_fechas):
+	cursor = conexion.cursor()
+	cursor.execute("""
+		INSERT INTO sancion_jugador (ci_jugador, id_torneo, motivo, numero_fecha_inicio, cantidad_fechas)
+		VALUES (%s, %s, 'disciplinaria', %s, %s)
+	""", (ci_jugador, id_torneo, numero_fecha_inicio, cantidad_fechas))
+	conexion.commit()
+	return cursor.lastrowid
+
+def obtener(conexion, id_sancion):
+	cursor = conexion.cursor(dictionary=True)
+	cursor.execute("""
+		SELECT id_sancion, ci_jugador, id_torneo, motivo,
+		       numero_fecha_inicio, cantidad_fechas, id_tarjeta
+		FROM sancion_jugador
+		WHERE id_sancion = %s
+	""", (id_sancion,))
+	return cursor.fetchone()
+
+
+def actualizar(conexion, id_sancion, numero_fecha_inicio, cantidad_fechas):
+	cursor = conexion.cursor()
+	cursor.execute("""
+		UPDATE sancion_jugador SET numero_fecha_inicio = %s, cantidad_fechas = %s
+		WHERE id_sancion = %s
+	""", (numero_fecha_inicio, cantidad_fechas, id_sancion))
+	conexion.commit()
+
+def eliminar(conexion, id_sancion):
+	cursor = conexion.cursor()
+	cursor.execute("DELETE FROM sancion_jugador WHERE id_sancion = %s", (id_sancion,))
+	conexion.commit()
