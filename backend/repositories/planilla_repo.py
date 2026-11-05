@@ -53,3 +53,72 @@ def quitar(conexion, id_partido, ci_jugador):
 	except Exception:
 		conexion.rollback()
 		raise
+
+def listar_goles(conexion, id_partido):
+	cursor = conexion.cursor(dictionary=True)
+	cursor.execute("""
+		SELECT g.id_gol, g.ci_jugador, j.nombre, j.apellido, pp.id_equipo,
+		       g.minuto, g.autogol
+		FROM gol g
+		JOIN jugador j ON j.ci = g.ci_jugador
+		JOIN planilla_partido pp ON pp.id_partido = g.id_partido
+		                        AND pp.ci_jugador = g.ci_jugador
+		WHERE g.id_partido = %s
+		ORDER BY g.minuto, g.id_gol
+	""", (id_partido,))
+	return cursor.fetchall()
+
+
+def agregar_gol(conexion, id_partido, ci_jugador, minuto, autogol):
+	cursor = conexion.cursor()
+	cursor.execute("INSERT INTO gol (id_partido, ci_jugador, minuto, autogol) VALUES (%s, %s, %s, %s)",
+	               (id_partido, ci_jugador, minuto, autogol))
+	conexion.commit()
+	return cursor.lastrowid
+
+
+def existe_gol(conexion, id_partido, id_gol):
+	cursor = conexion.cursor()
+	cursor.execute("SELECT 1 FROM gol WHERE id_gol = %s AND id_partido = %s", (id_gol, id_partido))
+	return cursor.fetchone() is not None
+
+
+def quitar_gol(conexion, id_gol):
+	cursor = conexion.cursor()
+	cursor.execute("DELETE FROM gol WHERE id_gol = %s", (id_gol,))
+	conexion.commit()
+
+
+def listar_tarjetas(conexion, id_partido):
+	cursor = conexion.cursor(dictionary=True)
+	cursor.execute("""
+		SELECT t.id_tarjeta, t.ci_jugador, j.nombre, j.apellido, pp.id_equipo,
+		       t.minuto, t.color
+		FROM tarjeta t
+		JOIN jugador j ON j.ci = t.ci_jugador
+		JOIN planilla_partido pp ON pp.id_partido = t.id_partido
+		                        AND pp.ci_jugador = t.ci_jugador
+		WHERE t.id_partido = %s
+		ORDER BY t.minuto, t.id_tarjeta
+	""", (id_partido,))
+	return cursor.fetchall()
+
+
+def agregar_tarjeta(conexion, id_partido, ci_jugador, minuto, color):
+	cursor = conexion.cursor()
+	cursor.execute("INSERT INTO tarjeta (id_partido, ci_jugador, minuto, color) VALUES (%s, %s, %s, %s)",
+	               (id_partido, ci_jugador, minuto, color))
+	conexion.commit()
+	return cursor.lastrowid
+
+
+def existe_tarjeta(conexion, id_partido, id_tarjeta):
+	cursor = conexion.cursor()
+	cursor.execute("SELECT 1 FROM tarjeta WHERE id_tarjeta = %s AND id_partido = %s", (id_tarjeta, id_partido))
+	return cursor.fetchone() is not None
+
+
+def quitar_tarjeta(conexion, id_tarjeta):
+	cursor = conexion.cursor()
+	cursor.execute("DELETE FROM tarjeta WHERE id_tarjeta = %s", (id_tarjeta,))
+	conexion.commit()
