@@ -48,3 +48,14 @@ def cambiar_estado(conexion, id_partido, estado):
 	cursor = conexion.cursor()
 	cursor.execute("UPDATE partido SET estado = %s WHERE id_partido = %s", (estado, id_partido))
 	conexion.commit()
+
+def reprogramar(conexion, id_partido, dia, id_turno, nombre_cancha, id_complejo, motivo):
+	cursor = conexion.cursor()
+	cursor.execute("SET @motivo_reprogramacion = %s", (motivo,))
+	cursor.execute("""
+		UPDATE partido
+		SET dia = %s, id_turno = %s, nombre_cancha = %s, id_complejo = %s,
+		    estado = 'programado'
+		WHERE id_partido = %s
+	""", (dia, id_turno, nombre_cancha, id_complejo, id_partido))
+	conexion.commit()
