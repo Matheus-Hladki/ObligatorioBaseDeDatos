@@ -22,3 +22,27 @@ def crear_disciplinaria(conexion, ci_jugador, id_torneo, numero_fecha_inicio, ca
 	""", (ci_jugador, id_torneo, numero_fecha_inicio, cantidad_fechas))
 	conexion.commit()
 	return cursor.lastrowid
+
+def obtener(conexion, id_sancion):
+	cursor = conexion.cursor(dictionary=True)
+	cursor.execute("""
+		SELECT id_sancion, ci_jugador, id_torneo, motivo,
+		       numero_fecha_inicio, cantidad_fechas, id_tarjeta
+		FROM sancion_jugador
+		WHERE id_sancion = %s
+	""", (id_sancion,))
+	return cursor.fetchone()
+
+
+def actualizar(conexion, id_sancion, numero_fecha_inicio, cantidad_fechas):
+	cursor = conexion.cursor()
+	cursor.execute("""
+		UPDATE sancion_jugador SET numero_fecha_inicio = %s, cantidad_fechas = %s
+		WHERE id_sancion = %s
+	""", (numero_fecha_inicio, cantidad_fechas, id_sancion))
+	conexion.commit()
+
+def eliminar(conexion, id_sancion):
+	cursor = conexion.cursor()
+	cursor.execute("DELETE FROM sancion_jugador WHERE id_sancion = %s", (id_sancion,))
+	conexion.commit()

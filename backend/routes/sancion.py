@@ -12,6 +12,10 @@ class SancionNueva(BaseModel):
   numero_fecha_inicio: int = Field(ge=1, le=127)
   cantidad_fechas: int = Field(ge=1, le=127)
 
+class SancionModificada(BaseModel):
+  numero_fecha_inicio: int = Field(ge=1, le=127)
+  cantidad_fechas: int = Field(ge=1, le=127)
+
 router = APIRouter(prefix="/sanciones", tags=["Sanciones"])
 
 
@@ -39,6 +43,39 @@ def cargar_sancion(datos: SancionNueva, usuario = Depends(solo_admin)):
     if error.errno == 1452:
       raise HTTPException(status_code=400, detail="No existe un jugador con esa cédula")
     raise
+  except mysql.connector.DatabaseError as error:
+    error_de_regla(error)
+  finally:
+    conexion.close()
+
+def obtener_disciplinaria(conexion, id_sancion):
+  sancion = sancion_repo.obtener(conexion, id_sancion)
+  if sancion is None:
+    raise HTTPException(status_code=404, detail="No existe una sanción con ese id")
+  if sancion["motivo"] != "disciplinaria":
+    raise HTTPException(status_code=400, detail="Las sanciones por roja o acumulación se generan a partir de las tarjetas; para corregirlas, modifique o quite la tarjeta")
+  return sancion
+
+
+@router.put("/{id_sancion}")
+def modificar_sancion(id_sancion: int, datos: SancionModificada, usuario = Depends(solo_admin)):
+  conexion = conectar()
+  try:
+    obtener_disciplinaria(conexion, id_sancion)
+    sancion_repo.actualizar(conexion, id_sancion, datos.numero_fecha_inicio, datos.cantidad_fechas)
+    return sancion_repo.obtener(conexion, id_sancion)
+  except mysql.connector.DatabaseError as error:
+    error_de_regla(error)
+  finally:
+    conexion.close()
+
+
+@router.delete("/{id_sancion}", status_code=204)
+def eliminar_sancion(id_sancion: int, usuario = Depends(solo_admin)):
+  conexion = conectar()
+  try:
+    obtener_disciplinaria(conexion, id_sancion)
+    sancion_repo.eliminar(conexion, id_sancion)
   except mysql.connector.DatabaseError as error:
     error_de_regla(error)
   finally:

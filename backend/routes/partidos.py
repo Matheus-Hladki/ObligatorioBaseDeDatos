@@ -123,3 +123,19 @@ def reprogramar_partido(id_partido: int, datos: Reprogramacion, usuario = Depend
     error_de_regla(error)
   finally:
     conexion.close()
+
+@router.delete("/{id_partido}", status_code=204)
+def eliminar_partido(id_partido: int, usuario = Depends(solo_admin)):
+  conexion = conectar()
+  try:
+    if partido_repo.obtener(conexion, id_partido) is None:
+      raise HTTPException(status_code=404, detail="No existe un partido con ese id")
+    partido_repo.eliminar(conexion, id_partido)
+  except mysql.connector.IntegrityError as error:
+    if error.errno in (1451, 1217):
+      raise HTTPException(status_code=409, detail="No se puede borrar, el partido tiene datos asociados")
+    raise
+  except mysql.connector.DatabaseError as error:
+    error_de_regla(error)
+  finally:
+    conexion.close()

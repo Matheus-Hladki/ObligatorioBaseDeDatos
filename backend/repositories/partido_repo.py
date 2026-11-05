@@ -59,3 +59,8 @@ def reprogramar(conexion, id_partido, dia, id_turno, nombre_cancha, id_complejo,
 		WHERE id_partido = %s
 	""", (dia, id_turno, nombre_cancha, id_complejo, id_partido))
 	conexion.commit()
+
+def eliminar(conexion, id_partido):
+	cursor = conexion.cursor()
+	cursor.execute("DELETE FROM partido WHERE id_partido = %s", (id_partido,))
+	conexion.commit()
