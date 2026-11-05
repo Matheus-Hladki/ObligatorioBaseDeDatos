@@ -21,3 +21,15 @@ def existe_torneo(conexion, id_torneo):
 	cursor = conexion.cursor()
 	cursor.execute("SELECT 1 FROM torneo WHERE id_torneo = %s", (id_torneo,))
 	return cursor.fetchone() is not None
+
+def crear(conexion, id_torneo, numero_fecha, id_equipo_local, id_equipo_visitante,
+          dia, id_turno, nombre_cancha, id_complejo):
+	cursor = conexion.cursor()
+	cursor.execute("""
+		INSERT INTO partido (id_torneo, numero_fecha, id_equipo_local, id_equipo_visitante,
+		                     dia, id_turno, nombre_cancha, id_complejo)
+		VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+	""", (id_torneo, numero_fecha, id_equipo_local, id_equipo_visitante,
+	      dia, id_turno, nombre_cancha, id_complejo))
+	conexion.commit()
+	return cursor.lastrowid
