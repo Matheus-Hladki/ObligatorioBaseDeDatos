@@ -5,6 +5,7 @@ from routes import login
 from routes import turnos
 from routes import usuarios
 from routes import complejos
+from routes import jugadores
 
 app = FastAPI()
 
@@ -13,3 +14,4 @@ app.include_router(login.router)
 app.include_router(turnos.router)
 app.include_router(usuarios.router)
 app.include_router(complejos.router)
+app.include_router(jugadores.router)
