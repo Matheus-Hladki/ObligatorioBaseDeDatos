@@ -1,8 +1,9 @@
 from db import conectar
 from repositories import facultad_repo
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 import mysql.connector
+from auth import usuario_actual, solo_admin, ROL_A_DB
 
 class FacultadNueva(BaseModel):
   nombre: str = Field(min_length=1, max_length=100)
@@ -10,15 +11,15 @@ class FacultadNueva(BaseModel):
 router = APIRouter(prefix="/facultades", tags=["Facultades"])
 
 @router.get("")
-def listar_facultades():
-  conexion = conectar()
+def listar_facultades(usuario = Depends(usuario_actual)):
+  conexion = conectar(ROL_A_DB[usuario["rol"]])
   try:
     return facultad_repo.listar(conexion)
   finally:
     conexion.close()
 
 @router.post("", status_code=201)
-def crear_facultad(datos: FacultadNueva):
+def crear_facultad(datos: FacultadNueva, usuario = Depends(solo_admin)):
   conexion = conectar()
   try:
     id_nuevo = facultad_repo.crear(conexion, datos.nombre)
@@ -31,8 +32,8 @@ def crear_facultad(datos: FacultadNueva):
     conexion.close()
 
 @router.get("/{id_facultad}")
-def obtener_facultad(id_facultad: int):
-  conexion = conectar()
+def obtener_facultad(id_facultad: int, usuario = Depends(usuario_actual)):
+  conexion = conectar(ROL_A_DB[usuario["rol"]])
   try:
     facultad = facultad_repo.obtener(conexion, id_facultad)
     if facultad is None:
@@ -42,7 +43,7 @@ def obtener_facultad(id_facultad: int):
     conexion.close()
 
 @router.put("/{id_facultad}")
-def actualizar_facultad(id_facultad: int, datos: FacultadNueva):
+def actualizar_facultad(id_facultad: int, datos: FacultadNueva, usuario = Depends(solo_admin)):
   conexion = conectar()
   try:
     if facultad_repo.obtener(conexion, id_facultad) is None:
@@ -57,7 +58,7 @@ def actualizar_facultad(id_facultad: int, datos: FacultadNueva):
     conexion.close()
 
 @router.delete("/{id_facultad}", status_code=204)
-def eliminar_facultad(id_facultad: int):
+def eliminar_facultad(id_facultad: int, usuario = Depends(solo_admin)):
   conexion = conectar()
   try:
     if facultad_repo.obtener(conexion, id_facultad) is None:
