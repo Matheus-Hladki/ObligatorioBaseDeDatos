@@ -33,3 +33,18 @@ def crear(conexion, id_torneo, numero_fecha, id_equipo_local, id_equipo_visitant
 	      dia, id_turno, nombre_cancha, id_complejo))
 	conexion.commit()
 	return cursor.lastrowid
+
+def obtener(conexion, id_partido):
+	cursor = conexion.cursor(dictionary=True)
+	cursor.execute("""
+		SELECT id_partido, id_torneo, numero_fecha, id_equipo_local, id_equipo_visitante,
+		       dia, id_turno, nombre_cancha, id_complejo, estado
+		FROM partido
+		WHERE id_partido = %s
+	""", (id_partido,))
+	return cursor.fetchone()
+
+def cambiar_estado(conexion, id_partido, estado):
+	cursor = conexion.cursor()
+	cursor.execute("UPDATE partido SET estado = %s WHERE id_partido = %s", (estado, id_partido))
+	conexion.commit()
