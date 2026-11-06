@@ -184,6 +184,14 @@ Se definieron en equipo varios puntos que la letra deja abiertos (consultados co
 - El login ahora responde `401` con un mensaje genérico ("Correo o contraseña incorrectos") tanto si el correo no existe como si la contraseña es incorrecta.
 - Se corrigió el manejo de claves foráneas inexistentes en partidos, planilla y sanciones: con usuarios de permisos limitados MySQL informa el error con el código `1216` (en lugar de `1452`), y antes eso terminaba en un error `500`.
 
+## 05/11/2026 — CORS
+
+### Qué se hizo
+
+- Se habilitó CORS en el backend para que el frontend pueda llamarlo desde el navegador, ya que corre en otro puerto (otro origen).
+- Los orígenes permitidos se configuran en la variable `CORS_ORIGINS` del `.env` (por defecto, `http://localhost:5173`, el puerto de Vite), así se pueden cambiar sin tocar el código, por ejemplo en Docker.
+- Solo se permiten esos orígenes, no cualquiera: un pedido desde otro sitio es rechazado. Se permite el encabezado `Authorization` para que el token llegue a los endpoints protegidos.
+
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título

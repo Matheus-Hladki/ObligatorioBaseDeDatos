@@ -16,6 +16,20 @@ from routes import reportes
 
 app = FastAPI()
 
+import os
+
+from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+
+load_dotenv()
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:5173").split(","),
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
+
 app.include_router(facultades.router)
 app.include_router(login.router)
 app.include_router(turnos.router)
