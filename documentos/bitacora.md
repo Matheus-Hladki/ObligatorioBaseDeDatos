@@ -156,6 +156,34 @@ Se definieron en equipo varios puntos que la letra deja abiertos (consultados co
 - Se protegieron los endpoints: sin sesión válida responden `401`, y sin el rol necesario, `403`.
 - Facultades: cualquier usuario con sesión puede consultarlas, y solo un administrador puede crearlas, modificarlas o borrarlas.
 - Cada pedido se conecta a MySQL con el usuario del rol de quien lo hace, así los permisos también los controla la base.
+
+## 05/11/2026 — División del trabajo del backend
+
+### Qué se hizo
+
+- Antes de dividir el trabajo se agregó `errores.py`, con una función común que traduce los errores de los triggers (`SIGNAL`, errno `1644`) a una respuesta `400` con el mensaje del trigger, para que todos los endpoints respondan igual ante una regla de negocio violada.
+- Se completó el README con el instructivo para levantar el proyecto sin Docker.
+- El backend se dividió en dos ramas a partir de `backend`: `backend-abm` (usuarios, jugadores, torneos, equipos y planteles, complejos, canchas y turnos) y `backend-partidos` (partidos, planilla, sanciones y reportes). Cada integrante trabaja en sus propios archivos para evitar conflictos.
+
+## 05/11/2026 — ABM de los datos del torneo
+
+### Qué se hizo
+
+- `GET /turnos`, con las horas formateadas (`18:00`) desde la consulta SQL.
+- `POST /usuarios`: el administrador crea planilleros u otros administradores; la contraseña se guarda con bcrypt y el rol se valida en el modelo.
+- ABM de complejos, jugadores, canchas y torneos. Los datos de entrada se validan en el modelo (cédula de 7 u 8 dígitos, fechas, tipos y estados permitidos) y los errores de la base se traducen a respuestas claras (`404`, `409` por duplicados o datos en uso, `400` por reglas de negocio).
+- Canchas: como su clave es compuesta (nombre y complejo), las rutas quedan anidadas bajo el complejo (`/complejos/{id}/canchas/{nombre}`).
+- Torneos: el estado se cambia con un endpoint propio (`PATCH /torneos/{id}/estado`), separado de la edición de datos, para que corregir una fecha no pueda disparar sin querer las reglas de inicio o fin del torneo.
+- Equipos y planteles: crear un equipo con su plantel y su capitán se hace en una sola transacción (un único `commit` al final y `rollback` si algo falla), así nunca queda un equipo creado a medias. También se pueden agregar y quitar jugadores y cambiar el capitán.
+
+## 05/11/2026 — Integración y correcciones
+
+### Qué se hizo
+
+- Se integraron las dos ramas del backend en `backend` y se verificó que el sistema completo levanta con todos los endpoints.
+- El login ahora responde `401` con un mensaje genérico ("Correo o contraseña incorrectos") tanto si el correo no existe como si la contraseña es incorrecta.
+- Se corrigió el manejo de claves foráneas inexistentes en partidos, planilla y sanciones: con usuarios de permisos limitados MySQL informa el error con el código `1216` (en lugar de `1452`), y antes eso terminaba en un error `500`.
+
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título
