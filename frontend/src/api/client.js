@@ -1,6 +1,6 @@
-//nuico lugar donde el front habla con el backend. Si cambia una URL del backend, se toca solo este archivo.
+// Único lugar donde el front habla con el backend. Si cambia una URL del backend, se toca solo este archivo.
 
-const BASE = "/api"; // en dev lo reenvía Vite, en Docker lo reenvía nginx
+const BASE = "http://127.0.0.1:8000";
 
 function cerrarSesion() {
   localStorage.removeItem("token");
@@ -8,7 +8,7 @@ function cerrarSesion() {
   window.location.href = "/login";
 }
 
-//Arma "?a=1&b=2" ignorando valores vacíos
+// Arma "?a=1&b=2" ignorando valores vacíos
 function qs(params = {}) {
   const p = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
@@ -26,7 +26,7 @@ function mensajeDeError(data, status) {
     // 422 de Pydantic: [{loc:[...], msg:"..."}]
     return d.map((e) => `${e.loc?.slice(-1)[0] ?? "campo"}: ${e.msg}`).join(" · ");
   }
-  return `Error ${status}`;
+  return data?.error || `Error ${status}`;
 }
 
 async function request(path, { method = "GET", body, params } = {}) {
@@ -48,28 +48,31 @@ async function request(path, { method = "GET", body, params } = {}) {
   const data = await res.json().catch(() => null); // 204 no trae cuerpo
 
   if (!res.ok) {
-    // Sesión vencida o inválida, mnesos 401
+    // Sesión vencida o inválida, menos en el login
     if (res.status === 401 && path !== "/login") cerrarSesion();
+    // los triggers de MySQL devuelven mensajes claros (ej: "el jugador está suspendido")
     throw new Error(mensajeDeError(data, res.status));
   }
   return data;
 }
 
 export const api = {
-  //para las pantallas que se vayan sumando
+  // métodos genéricos (los usan casi todas las páginas)
   get: (path, params) => request(path, { params }),
   post: (path, body) => request(path, { method: "POST", body }),
   put: (path, body) => request(path, { method: "PUT", body }),
   patch: (path, body) => request(path, { method: "PATCH", body }),
   del: (path) => request(path, { method: "DELETE" }),
 
+  // atajos específicos
   login: (correo, contrasena) =>
     request("/login", { method: "POST", body: { correo, contrasena } }),
 
   torneos: () => request("/torneos"),
+  equipos: (id_torneo) => request("/equipos", { params: { id_torneo } }),
   partidos: (id_torneo) => request("/partidos", { params: { id_torneo } }),
 
-  // Reportes (solo administrador). nombre = posiciones, goleadores, fair-play, etc
+  // reportes (solo administrador): api.reporte("posiciones", idTorneo) o con extra: { numero_fecha: 3 }
   reporte: (nombre, id_torneo, extra) =>
     request(`/reportes/${nombre}`, { params: { id_torneo, ...extra } }),
 };
