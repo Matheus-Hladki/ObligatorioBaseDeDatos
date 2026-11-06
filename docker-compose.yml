@@ -16,11 +16,7 @@ services:
     ports:
       - "3307:3306"
     healthcheck:
-      test: ["CMD-SHELL", "mysql -uroot -proot_dev_2026 -e \"SELECT 1 FROM campeonato_universitario.turno LIMIT 1\" || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
-      start_period: 20s
+        test: ["CMD-SHELL", "mysql -h127.0.0.1 -uroot -proot_dev_2026 -e \"SELECT 1 FROM campeonato_universitario.sancion_jugador LIMIT 1\" || exit 1"]
 
   backend:
     build: ./backend

@@ -8,7 +8,7 @@ from auth import crear_token
 
 class UsuarioLogin(BaseModel):
   correo: str = Field(min_length=1, max_length=100 )
-  contrasena: str = Field(min_length=1, max_length=100 )
+  contrasena: str = Field(min_length=1, max_length=72 ) ##para evitar un 500 con bcrypt 5
 
 router = APIRouter(prefix="/login", tags=["Login"])
 

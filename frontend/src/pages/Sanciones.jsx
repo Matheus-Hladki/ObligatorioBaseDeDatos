@@ -7,7 +7,7 @@ import FormModal from "../components/FormModal.jsx";
 
 export default function Sanciones() {
   const [idTorneo, setIdTorneo] = useState(null);
-  const { data, error, loading, reload } = useFetch(() => (idTorneo ? api.get(`/sanciones/`, { id_torneo: idTorneo }) : Promise.resolve([])), [idTorneo]);
+  const { data, error, loading, reload } = useFetch(() => (idTorneo ? api.get(`/sanciones`, { id_torneo: idTorneo }) : Promise.resolve([])), [idTorneo]);
   const { data: jugadores } = useFetch(() => api.get("/jugadores"));
   const accion = useAccion(reload);
   const [form, setForm] = useState(null);
