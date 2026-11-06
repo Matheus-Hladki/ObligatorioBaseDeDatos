@@ -22,7 +22,15 @@ export default function App() {
       >
         <Route path="/" element={<Home />} />
         <Route path="/partidos" element={<Partidos />} />
-        <Route path="/posiciones" element={<Posiciones />} />
+        {/* Los reportes son solo para administradores (así lo exige el backend) */}
+        <Route
+          path="/posiciones"
+          element={
+            <ProtectedRoute roles={["administrador"]}>
+              <Posiciones />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Ejemplo de ruta solo para admin (cuando exista la página):
         <Route path="/admin/equipos" element={

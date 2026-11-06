@@ -1,40 +1,75 @@
-// nuico lugar donde el front habla con el backend, si cambia una URL del backend, se toca solo eso
+//nuico lugar donde el front habla con el backend. Si cambia una URL del backend, se toca solo este archivo.
 
 const BASE = "/api"; // en dev lo reenvía Vite, en Docker lo reenvía nginx
 
-// si hay token, lo agrega el token y convierte errores en excepciones
-async function request(path, {method = "GET", body} = {}) {
-  const token = localStorage.getItem("token");
+function cerrarSesion() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "/login";
+}
 
-  const headers = {
-    "Content-Type": "application/json"
-  };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    headers,
-     //si hay sesión iniciada, el backend sabe quien somos por este header
-    body: body ? JSON.stringify(body) : undefined,
+//Arma "?a=1&b=2" ignorando valores vacíos
+function qs(params = {}) {
+  const p = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== "") p.append(k, v);
   });
+  const s = p.toString();
+  return s ? `?${s}` : "";
+}
 
-  //intentamos leer el JSON; si no hay cuerpo, queda null
-  const data = await res.json().catch(() => null);
+// Mensaje legible a partir de la respuesta de error de FastAPI
+function mensajeDeError(data, status) {
+  const d = data?.detail;
+  if (typeof d === "string") return d;
+  if (Array.isArray(d)) {
+    // 422 de Pydantic: [{loc:[...], msg:"..."}]
+    return d.map((e) => `${e.loc?.slice(-1)[0] ?? "campo"}: ${e.msg}`).join(" · ");
+  }
+  return `Error ${status}`;
+}
+
+async function request(path, { method = "GET", body, params } = {}) {
+  const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  let res;
+  try {
+    res = await fetch(`${BASE}${path}${qs(params)}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new Error("No se pudo conectar con el servidor");
+  }
+
+  const data = await res.json().catch(() => null); // 204 no trae cuerpo
 
   if (!res.ok) {
-    // Los triggers de MySQL devuelven mensajes claros (ej: "el jugador está suspendido")
-    // Si el backend los reenvia q los muestre asi
-    throw new Error(data?.detail || data?.error || `Error ${res.status}`);
+    // Sesión vencida o inválida, mnesos 401
+    if (res.status === 401 && path !== "/login") cerrarSesion();
+    throw new Error(mensajeDeError(data, res.status));
   }
   return data;
 }
 
-//Endpoints, acordarlos con el back
 export const api = {
+  //para las pantallas que se vayan sumando
+  get: (path, params) => request(path, { params }),
+  post: (path, body) => request(path, { method: "POST", body }),
+  put: (path, body) => request(path, { method: "PUT", body }),
+  patch: (path, body) => request(path, { method: "PATCH", body }),
+  del: (path) => request(path, { method: "DELETE" }),
+
   login: (correo, contrasena) =>
     request("/login", { method: "POST", body: { correo, contrasena } }),
 
-  partidos: () => request("/partidos"),
-  posiciones: () => request("/posiciones"),
+  torneos: () => request("/torneos"),
+  partidos: (id_torneo) => request("/partidos", { params: { id_torneo } }),
+
+  // Reportes (solo administrador). nombre = posiciones, goleadores, fair-play, etc
+  reporte: (nombre, id_torneo, extra) =>
+    request(`/reportes/${nombre}`, { params: { id_torneo, ...extra } }),
 };

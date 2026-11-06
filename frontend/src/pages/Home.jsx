@@ -15,7 +15,7 @@ export default function Home() {
       </p>
       <div className="grid">
         <Link className="card" to="/partidos">Partidos</Link>
-        <Link className="card" to="/posiciones"> Posiciones</Link>
+        {esAdmin && <Link className="card" to="/posiciones">Posiciones</Link>}
         {/* TODO admin: equipos, planteles, fixture, sanciones, reportes */}
       </div>
     </>
