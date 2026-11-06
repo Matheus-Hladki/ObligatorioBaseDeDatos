@@ -5,4 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
 # Crea los usuarios iniciales (si no existen) y levanta la API
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "python seed_usuarios.py && uvicorn main:app --host 0.0.0.0 --port 8000"]
