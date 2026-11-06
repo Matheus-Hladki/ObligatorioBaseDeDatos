@@ -7,11 +7,10 @@ import FormModal from "../components/FormModal.jsx";
 
 export default function Sanciones() {
   const [idTorneo, setIdTorneo] = useState(null);
-  const { data, error, loading, reload } = useFetch(() => (idTorneo ? api.get(`/sanciones/${id_torneo}`, { id_torneo: idTorneo }) : Promise.resolve([])), [idTorneo]);
+  const { data, error, loading, reload } = useFetch(() => (idTorneo ? api.get(`/sanciones/`, { id_torneo: idTorneo }) : Promise.resolve([])), [idTorneo]);
   const { data: jugadores } = useFetch(() => api.get("/jugadores"));
   const accion = useAccion(reload);
   const [form, setForm] = useState(null);
-
   const campos = [
     { name: "ci_jugador", label: "Jugador", type: "select", requerido: true, disabled: !!form?.id_sancion, options: (jugadores ?? []).map((j) => ({ value: j.ci, label: `${j.apellido}, ${j.nombre} · ${j.ci}` })) },
     { name: "numero_fecha_inicio", label: "Fecha de inicio (nº de fecha del torneo)", type: "number", requerido: true, min: 1, max: 127 },
