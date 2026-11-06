@@ -1,3 +1,4 @@
+SET NAMES utf8mb4;
 DROP DATABASE IF EXISTS campeonato_universitario;
 
 CREATE DATABASE campeonato_universitario CHARACTER
