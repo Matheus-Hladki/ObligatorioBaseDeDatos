@@ -6,7 +6,6 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Cada input tiene su estado: React "controla" lo que se escribe
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
@@ -39,7 +38,7 @@ export default function Login() {
           <input type="password" value={contrasena} onChange={(e) => setContrasena(e.target.value)} required />
         </label>
         {error && <p className="error">{error}</p>}
-        <button disabled={cargando}>{cargando ? "Entrando..." : "Entrar"}</button>
+        <button disabled={cargando}>{cargando ? "Entrando" : "Entrar"}</button>
       </form>
     </div>
   );

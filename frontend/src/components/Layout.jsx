@@ -12,9 +12,20 @@ export default function Layout() {
         <strong>Torneo Interfacultades F5</strong>
         <nav>
           <Link to="/">Inicio</Link>
-          <Link to="/posiciones">Posiciones</Link>
           {/* Los dos roles ven partidos; el planillero carga planillas desde acá */}
           <Link to="/partidos">Partidos</Link>
+          {user.rol === "administrador" && (
+            <>
+              <Link to="/torneos">Torneos</Link>
+              <Link to="/equipos">Equipos</Link>
+              <Link to="/jugadores">Jugadores</Link>
+              <Link to="/facultades">Facultades</Link>
+              <Link to="/complejos">Complejos</Link>
+              <Link to="/sanciones">Sanciones</Link>
+              <Link to="/reportes">Reportes</Link>
+              <Link to="/usuarios">Usuarios</Link>
+            </>
+          )}
         </nav>
         <div className="user">
           <span>

@@ -174,3 +174,44 @@ th {
 .badge.jugado { background: #dcfce7; color: #166534; }
 .badge.cancelado { background: #fee2e2; color: #991b1b; }
 .badge.postergado { background: #fef3c7; color: #92400e; }
+.torneo-select { display: inline-block; margin: 0.5rem 0 1rem; }
+.torneo-select select { margin-left: 0.4rem; padding: 0.3rem 0.5rem; }
+
+select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+}
+label.check { display: flex; align-items: center; gap: 0.5rem; }
+label.check input { width: auto; margin: 0; }
+button.secundario { background: #e2e8f0; color: #0f172a; }
+button.secundario:hover { background: #cbd5e1; }
+button.peligro { background: #dc2626; }
+button.peligro:hover { background: #b91c1c; }
+button.chico { padding: 0.25rem 0.6rem; font-size: 0.8rem; }
+.topbar nav { flex-wrap: wrap; gap: 1rem; }
+.container { max-width: 1200px; }
+.barra { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
+.fila-acciones { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.modal-fondo { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 10; }
+.modal { background: #fff; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 520px; max-height: 90vh; overflow: auto; }
+.modal.ancho { max-width: 800px; }
+.modal-cabeza { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.acciones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+.ok { color: #166534; font-size: 0.9rem; margin: 0.5rem 0; }
+.badge.programado { background: #dbeafe; color: #1e40af; }
+.badge.roja { background: #fee2e2; color: #991b1b; }
+.badge.amarilla { background: #fef3c7; color: #92400e; }
+.dos-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 700px) { .dos-col { grid-template-columns: 1fr; } }
+.tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
+.tabs button { background: #e2e8f0; color: #0f172a; }
+.tabs button.activo { background: #2563eb; color: #fff; }
+.tabla-scroll { overflow-x: auto; }
+h1 { margin-bottom: 0.5rem; }
+h2, h3 { margin: 1rem 0 0.5rem; }
