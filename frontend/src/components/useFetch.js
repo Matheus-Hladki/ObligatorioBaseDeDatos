@@ -6,6 +6,8 @@ export default function useFetch(fn, deps = []) {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [version, setVersion] = useState(0); // al subirlo se vuelve a pedir
+  const reload = () => setVersion((v) => v + 1);
 
   useEffect(() => {
     let vigente = true; // evita pisar el estado si el componente ya cmabio
@@ -18,7 +20,7 @@ export default function useFetch(fn, deps = []) {
     return () => {
       vigente = false;
     };
-  }, deps);
+  }, [...deps, version]);
 
-  return { data, error, loading };
+  return { data, error, loading, reload };
 }
