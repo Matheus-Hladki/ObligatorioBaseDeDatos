@@ -1,3 +1,4 @@
+SET NAMES utf8mb4;
 USE campeonato_universitario;
 
 DELIMITER $$

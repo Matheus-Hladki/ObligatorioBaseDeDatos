@@ -12,4 +12,6 @@ def conectar(role="ADMIN"):
         user=os.getenv(f"DB_{role}_USER"),
         password=os.getenv(f"DB_{role}_PASSWORD"),
         database=os.getenv("DB_NAME"),
+        charset="utf8mb4",
+        collation="utf8mb4_spanish_ci",
     )

@@ -1,3 +1,4 @@
+SET NAMES utf8mb4;
 USE campeonato_universitario;
 
 INSERT INTO facultad (id_facultad, nombre) VALUES
