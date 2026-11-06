@@ -113,6 +113,49 @@ Se definieron en equipo varios puntos que la letra deja abiertos (consultados co
 - `tables.sql`: columna `estado_anterior` en `partido_reprogramacion`.
 - `triggers.sql`: control de que el día del partido esté dentro del rango del torneo (al programar y al modificar), control al cambiar las fechas del torneo, y registro del estado anterior en el historial de reprogramaciones.
 
+## 04/11/2026 — Inicio del backend
+
+### Qué se hizo
+
+- Se mergeó la rama de la base de datos a `main` y se creó la rama `backend`.
+- Se estudió cómo estructurar el backend y cómo funciona FastAPI.
+- Se configuró el entorno virtual de Python y se creó un endpoint de prueba (`GET /hola`) para verificar que el servidor funciona.
+- Se agregó un `.gitignore` para excluir el entorno virtual, la caché de Python y el archivo `.env`.
+
+## 04/11/2026 — Conexión a la base y estructura del backend
+
+### Qué se hizo
+
+- Se conectó el backend a MySQL usando el usuario `torneo_admin`, con las credenciales en un archivo `.env` que no se sube al repositorio (se incluye un `.env.example` con las variables necesarias).
+- Se organizó el backend en capas: `db.py` para la conexión, `repositories/` para las consultas SQL y `routes/` para los endpoints.
+- Se creó el primer endpoint que lee datos de la base: `GET /facultades`.
+- Se configuró VS Code para usar el entorno virtual del proyecto.
+
+## 04/11/2026 — ABM de facultades
+
+### Qué se hizo
+
+- Se completó el ABM de facultades: listar, obtener una, crear, modificar y borrar.
+- Se validan los datos recibidos con modelos de Pydantic (respuesta `422` si no son válidos).
+- Se traducen los errores de la base a respuestas claras: `404` si la facultad no existe, `409` si el nombre ya está usado o si la facultad tiene jugadores o equipos asociados.
+- Se detectó que MySQL informa el error de clave foránea con códigos distintos según los privilegios del usuario (`1451` o `1217`), y se contemplan ambos.
+
+## 04/11/2026 — Usuarios y conexión por rol
+
+### Qué se hizo
+
+- Se creó un script (`crear_admin.py`) para dar de alta el primer administrador, con la contraseña hasheada con bcrypt.
+- La conexión a la base ahora usa el usuario de MySQL correspondiente a cada rol (`torneo_auth`, `torneo_admin`, `torneo_planillero`), con las credenciales en el `.env`. Se verificó que cada usuario solo puede hacer lo que sus permisos permiten.
+- Se agregó la generación de tokens JWT con vencimiento de 8 horas, firmados con una clave secreta guardada en el `.env`.
+
+## 05/11/2026 — Login y protección de endpoints
+
+### Qué se hizo
+
+- Se implementó el login (`POST /login`): verifica la contraseña con bcrypt y devuelve un token JWT con el correo y el rol. Ante un correo inexistente o una contraseña incorrecta responde lo mismo (`401`), para no revelar qué correos están registrados.
+- Se protegieron los endpoints: sin sesión válida responden `401`, y sin el rol necesario, `403`.
+- Facultades: cualquier usuario con sesión puede consultarlas, y solo un administrador puede crearlas, modificarlas o borrarlas.
+- Cada pedido se conecta a MySQL con el usuario del rol de quien lo hace, así los permisos también los controla la base.
 <!-- Plantilla para nuevas entradas:
 
 ## DD/MM/AAAA — Título

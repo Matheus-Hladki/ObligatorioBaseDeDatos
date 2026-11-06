@@ -12,8 +12,8 @@ Sistema para gestionar y organizar equipos, planteles, fixture, planillas de jue
 | **Componentes** | **Tecnologías** |
 | :--- | :--- |
 | **Base de Datos** | MySQL |
-| **Backend** | Python |
-| **Frontend** | React o React Native |
+| **Backend** | Python (FastAPI) |
+| **Frontend** | React |
 | **Contenedores** | Docker |
 
 ### Bitácora e Informe
@@ -23,6 +23,36 @@ Tanto el informe como la bitácora se encuentran en la carpeta documentos.
 **Con Docker**
 **Sin Docker**
 
+Requisitos: MySQL 8.0 y Python 3.12.
+
+1. Cargar la base en MySQL ejecutando, en este orden, los scripts de `base_de_datos/`: `tables.sql`, `triggers.sql`, `users.sql` y `data.sql`. Desde la consola de MySQL (conectado como root):
+   ```
+   source C:/ruta/al/repo/base_de_datos/tables.sql
+   source C:/ruta/al/repo/base_de_datos/triggers.sql
+   source C:/ruta/al/repo/base_de_datos/users.sql
+   source C:/ruta/al/repo/base_de_datos/data.sql
+   ```
+2. En la carpeta `backend/`, crear el entorno virtual e instalar las dependencias:
+   ```
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   ```
+3. Copiar `backend/.env.example` como `backend/.env` y completar las contraseñas de los usuarios de MySQL (están en `base_de_datos/users.sql`). Para `JWT_SECRET`, generar una clave con:
+   ```
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
+4. Crear el usuario administrador de la tabla de abajo:
+   ```
+   python crear_admin.py
+   ```
+5. Levantar el servidor:
+   ```
+   uvicorn main:app --reload
+   ```
+6. Abrir la documentación interactiva en http://localhost:8000/docs. Para usar los endpoints protegidos, iniciar sesión con `POST /login`, copiar el `token` de la respuesta y pegarlo en el botón **Authorize**.
+7. Crear el usuario planillero de la tabla de abajo con `POST /usuarios`, autenticado como administrador.
+
 ### Usuarios
 | **Rol** | **Correo** | **Contraseña** | **Permisos**
 | :--- | :--- | :--- | :--- |
@@ -31,9 +61,8 @@ Tanto el informe como la bitácora se encuentran en la carpeta documentos.
 
 ### Preguntas y cosas que faltan
 1. Definir las versiones de las tecnologías que vamos a usar
-2. Preguntarle a los profes que nos aconsejan más, si React o React Native
-3. Completar bien los requisitos para correrlo
-4. Completar mejor el informe, como donde impactan las cosas, ejemplo los datos confirmados y los supuestos
-5. Insertar el diagrama entidad-relación
-6. Confirmar que las consultas de posiciones y promedios apliquen el criterio de autogoles
-7. Poner el algoritmo de hash utilizado por el backend
+2. Completar bien los requisitos para correrlo
+3. Completar mejor el informe, como donde impactan las cosas, ejemplo los datos confirmados y los supuestos
+4. Insertar el diagrama entidad-relación
+5. Confirmar que las consultas de posiciones y promedios apliquen el criterio de autogoles
+6. Implementar `POST /usuarios` para que el administrador cree planilleros
