@@ -53,7 +53,7 @@ def agregar_jugador(id_partido: int, datos: JugadorPlanilla, usuario = Depends(u
   except mysql.connector.IntegrityError as error:
     if error.errno == 1062:
       raise HTTPException(status_code=409, detail="El jugador ya está en la planilla de este partido")
-    if error.errno == 1452:
+    if error.errno in (1452, 1216):
       raise HTTPException(status_code=400, detail="El jugador o el equipo no existen")
     raise
   except mysql.connector.DatabaseError as error:
@@ -94,7 +94,7 @@ def agregar_gol(id_partido: int, datos: GolNuevo, usuario = Depends(usuario_actu
     id_nuevo = planilla_repo.agregar_gol(conexion, id_partido, datos.ci_jugador, datos.minuto, datos.autogol)
     return {"id_gol": id_nuevo, "id_partido": id_partido, **datos.model_dump()}
   except mysql.connector.IntegrityError as error:
-    if error.errno == 1452:
+    if error.errno in (1452, 1216):
       raise HTTPException(status_code=400, detail="El jugador no está en la planilla de este partido")
     raise
   except mysql.connector.DatabaseError as error:
@@ -136,7 +136,7 @@ def agregar_tarjeta(id_partido: int, datos: TarjetaNueva, usuario = Depends(usua
     id_nuevo = planilla_repo.agregar_tarjeta(conexion, id_partido, datos.ci_jugador, datos.minuto, datos.color)
     return {"id_tarjeta": id_nuevo, "id_partido": id_partido, **datos.model_dump()}
   except mysql.connector.IntegrityError as error:
-    if error.errno == 1452:
+    if error.errno in (1452, 1216):
       raise HTTPException(status_code=400, detail="El jugador no está en la planilla de este partido")
     raise
   except mysql.connector.DatabaseError as error:

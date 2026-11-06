@@ -40,7 +40,7 @@ def cargar_sancion(datos: SancionNueva, usuario = Depends(solo_admin)):
                                                 datos.numero_fecha_inicio, datos.cantidad_fechas)
     return {"id_sancion": id_nuevo, **datos.model_dump(), "motivo": "disciplinaria"}
   except mysql.connector.IntegrityError as error:
-    if error.errno == 1452:
+    if error.errno in (1452, 1216):
       raise HTTPException(status_code=400, detail="No existe un jugador con esa cédula")
     raise
   except mysql.connector.DatabaseError as error:

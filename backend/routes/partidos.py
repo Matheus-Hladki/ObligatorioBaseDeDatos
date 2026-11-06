@@ -56,7 +56,7 @@ def programar_partido(datos: PartidoNuevo, usuario = Depends(solo_admin)):
   except mysql.connector.IntegrityError as error:
     if error.errno == 1062:
       raise HTTPException(status_code=409, detail="La cancha ya está ocupada en ese día y turno")
-    if error.errno == 1452:
+    if error.errno in (1452, 1216):
       raise HTTPException(status_code=400, detail="El turno o la cancha no existen, o un equipo no pertenece a ese torneo")
     raise
   except mysql.connector.DatabaseError as error:
@@ -116,7 +116,7 @@ def reprogramar_partido(id_partido: int, datos: Reprogramacion, usuario = Depend
   except mysql.connector.IntegrityError as error:
     if error.errno == 1062:
       raise HTTPException(status_code=409, detail="La cancha ya está ocupada en ese día y turno")
-    if error.errno == 1452:
+    if error.errno in (1452, 1216):
       raise HTTPException(status_code=400, detail="El turno o la cancha no existen")
     raise
   except mysql.connector.DatabaseError as error:
