@@ -1,6 +1,8 @@
 # Levanta todo el sistema: MySQL + backend (FastAPI) + frontend (React/nginx)
 #   docker compose up --build
-# Front: http://localhost:5173  ·  API/docs: http://localhost:8000/docs  ·  MySQL (host): puerto 3307
+# Front: http://localhost:5173  
+# API/docs: http://localhost:8000/docs
+#  MySQL (host): puerto 3307
 services:
   db:
     image: mysql:8.0
